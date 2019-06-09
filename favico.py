@@ -5,6 +5,10 @@ from urllib.parse import urlparse
 import os
 
 
+# initial variables
+filepath = "urls.txt"
+
+
 def getDomain(url):
     """
     Get domain uri from url
@@ -14,6 +18,12 @@ def getDomain(url):
     parsed_uri = urlparse(url)
     return '{uri.scheme}://{uri.netloc}'.format(uri=parsed_uri)
 
+def getExtension(url):
+    try:
+        path = urlparse.urlparse(url).path
+        return splitext(path)[1]
+    except:
+        return 'ico'
 
 def Filename(url):
     if 'http' not in url:
@@ -27,7 +37,7 @@ def Filename(url):
     return parsed_uri.netloc
 
 
-def download(url, originurl):
+def download(url, icoName):
     """
     Download fav icon from url
     :param url: string
@@ -37,12 +47,12 @@ def download(url, originurl):
     response = requests.get(url, stream=True)
 
     if response.status_code < 300:
-        with open('icons/{}.{}'.format(Filename(originurl), 'ico'), 'wb') as image:
+        with open('icons/{}.{}'.format(icoName, getExtension(url)), 'wb') as image:
             for chunk in response.iter_content(1024):
                 image.write(chunk)
-        print("downloaded icon from %s" % originurl)
+        print("downloaded icon %s" % icoName)
     else:
-        print("There is not ico in %s " % originurl)
+        print("There is not ico named %s " % icoName)
 
 def getFaviconLink(domain):
     if 'http' not in domain:
@@ -65,18 +75,21 @@ if __name__ == '__main__':
         os.makedirs('icons')
 
     # read urls from domains.txt file
-    file = open('domains.txt', 'r')
+    file = open(filepath, 'r')
     urls = file.readlines()
 
     # download favico from url
     for url in urls:
         try:
-            url = url.strip()
+            _row_dt = url.strip().split(';')
+            url = _row_dt[0].strip()
+            icoName = _row_dt[1]
             icoUrl = getFaviconLink(url)
             if not 'http' in icoUrl and '//' in icoUrl:
                 icoUrl = 'http:' + icoUrl
             elif not 'http' in icoUrl:
                 icoUrl = getDomain(url) + icoUrl
-            download(icoUrl, url)
-        except:
+            download(icoUrl, icoName)
+        except Exception as e:
+            print(e)
             print("There is not ico in %s " % url)
