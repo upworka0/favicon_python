@@ -1,6 +1,3 @@
-[3: 23
-PM] 3
-_Rojonghyok_2:
 from bs4 import BeautifulSoup
 import requests
 
