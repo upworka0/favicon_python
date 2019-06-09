@@ -38,6 +38,9 @@ def download(url, originurl):
     :param originurl:  string
     :return: None
     """
+    if 'http' not in url:
+        url = 'http://' + url.replace('//', '')
+
     response = requests.get(url, stream=True)
     if response.status_code < 300:
         with open('icons/{}.{}'.format(Filename(originurl), getExtension(url)), 'wb') as image:
