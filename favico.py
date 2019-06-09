@@ -34,23 +34,19 @@ def download(url, originurl):
     :param originurl:  string
     :return: None
     """
-    try:
-        response = requests.get(url, stream=True)
+    response = requests.get(url, stream=True)
 
-        if response.status_code < 300:
-            with open('icons/{}.{}'.format(Filename(originurl), 'ico'), 'wb') as image:
-                for chunk in response.iter_content(1024):
-                    image.write(chunk)
-            print("downloaded icon from %s" % originurl)
-        else:
-            print("There is not ico in %s " % originurl)
-    except:
+    if response.status_code < 300:
+        with open('icons/{}.{}'.format(Filename(originurl), 'ico'), 'wb') as image:
+            for chunk in response.iter_content(1024):
+                image.write(chunk)
+        print("downloaded icon from %s" % originurl)
+    else:
         print("There is not ico in %s " % originurl)
 
 def getFaviconLink(domain):
     if 'http' not in domain:
         domain = 'http://' + domain
-
     page = requests.get(domain)
 
     soup = BeautifulSoup(page.text, features="lxml")
@@ -74,11 +70,13 @@ if __name__ == '__main__':
 
     # download favico from url
     for url in urls:
-        url = url.strip()
-        icoUrl = getFaviconLink(url)
-
-        if not 'http' in icoUrl and '//' in icoUrl:
-            icoUrl = 'http:' + icoUrl
-        elif not 'http' in icoUrl:
-            icoUrl = getDomain(url) + icoUrl
-        download(icoUrl, url)
+        try:
+            url = url.strip()
+            icoUrl = getFaviconLink(url)
+            if not 'http' in icoUrl and '//' in icoUrl:
+                icoUrl = 'http:' + icoUrl
+            elif not 'http' in icoUrl:
+                icoUrl = getDomain(url) + icoUrl
+            download(icoUrl, url)
+        except:
+            print("There is not ico in %s " % url)
