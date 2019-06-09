@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
-
+from os.path import splitext
 from urllib.parse import urlparse
 import os
 
@@ -24,6 +24,13 @@ def Filename(url):
     parsed_uri = urlparse(url)
     return parsed_uri.netloc
 
+def getExtension(url):
+    try:
+        path = urlparse.urlparse(url).path
+        return splitext(path)[1]
+    except:
+        return 'ico'
+
 def download(url, originurl):
     """
     Download fav icon from url
@@ -33,10 +40,12 @@ def download(url, originurl):
     """
     response = requests.get(url, stream=True)
     if response.status_code < 300:
-        with open('icons/{}.{}'.format(Filename(originurl), 'ico'), 'wb') as image:
+        with open('icons/{}.{}'.format(Filename(originurl), getExtension(url)), 'wb') as image:
             for chunk in response.iter_content(1024):
                 image.write(chunk)
-    print("There is not ico in %s " % originurl)
+        print("download icon from %s" % originurl)
+    else:
+        print("There is not ico in %s " % originurl)
 
 def getFaviconLink(domain):
     if 'http' not in domain:
@@ -50,7 +59,7 @@ def getFaviconLink(domain):
         icon_link = soup.find("link", rel="icon")
 
     if icon_link is None:
-        return domain + '/favicon.ico'
+        return getDomain(domain) + '/favicon.ico'
     return icon_link["href"]
 
 
