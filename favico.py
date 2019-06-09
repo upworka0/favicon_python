@@ -1,8 +1,12 @@
+[3: 23
+PM] 3
+_Rojonghyok_2:
 from bs4 import BeautifulSoup
 import requests
-from os.path import splitext
+
 from urllib.parse import urlparse
 import os
+
 
 def getDomain(url):
     """
@@ -12,6 +16,7 @@ def getDomain(url):
     """
     parsed_uri = urlparse(url)
     return '{uri.scheme}://{uri.netloc}'.format(uri=parsed_uri)
+
 
 def Filename(url):
     if 'http' not in url:
@@ -24,12 +29,6 @@ def Filename(url):
     parsed_uri = urlparse(url)
     return parsed_uri.netloc
 
-def getExtension(url):
-    try:
-        path = urlparse.urlparse(url).path
-        return splitext(path)[1]
-    except:
-        return 'ico'
 
 def download(url, originurl):
     """
@@ -38,26 +37,26 @@ def download(url, originurl):
     :param originurl:  string
     :return: None
     """
-    if 'http' not in url:
-        url = 'http://' + url.replace('//', '')
 
     response = requests.get(url, stream=True)
+
     if response.status_code < 300:
-        with open('icons/{}.{}'.format(Filename(originurl), getExtension(url)), 'wb') as image:
+        with open('icons/{}.{}'.format(Filename(originurl), 'ico'), 'wb') as image:
             for chunk in response.iter_content(1024):
                 image.write(chunk)
-        print("download icon from %s" % originurl)
+        print("downloaded icon from %s" % originurl)
     else:
         print("There is not ico in %s " % originurl)
+
 
 def getFaviconLink(domain):
     if 'http' not in domain:
         domain = 'http://' + domain
 
     page = requests.get(domain)
+
     soup = BeautifulSoup(page.text, features="lxml")
     icon_link = soup.find("link", rel="shortcut icon")
-
     if icon_link is None:
         icon_link = soup.find("link", rel="icon")
 
@@ -79,6 +78,9 @@ if __name__ == '__main__':
     for url in urls:
         url = url.strip()
         icoUrl = getFaviconLink(url)
-        if not '://' in icoUrl:
+
+        if not 'http' in icoUrl and '//' in icoUrl:
+            icoUrl = 'http:' + icoUrl
+        elif not 'http' in icoUrl:
             icoUrl = getDomain(url) + icoUrl
         download(icoUrl, url)
