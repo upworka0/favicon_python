@@ -34,17 +34,18 @@ def download(url, originurl):
     :param originurl:  string
     :return: None
     """
+    try:
+        response = requests.get(url, stream=True)
 
-    response = requests.get(url, stream=True)
-
-    if response.status_code < 300:
-        with open('icons/{}.{}'.format(Filename(originurl), 'ico'), 'wb') as image:
-            for chunk in response.iter_content(1024):
-                image.write(chunk)
-        print("downloaded icon from %s" % originurl)
-    else:
+        if response.status_code < 300:
+            with open('icons/{}.{}'.format(Filename(originurl), 'ico'), 'wb') as image:
+                for chunk in response.iter_content(1024):
+                    image.write(chunk)
+            print("downloaded icon from %s" % originurl)
+        else:
+            print("There is not ico in %s " % originurl)
+    except:
         print("There is not ico in %s " % originurl)
-
 
 def getFaviconLink(domain):
     if 'http' not in domain:
