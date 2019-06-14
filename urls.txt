@@ -1,1 +1,1 @@
-google.com;google.com
+https://slack.com;google.com

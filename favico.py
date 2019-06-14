@@ -20,8 +20,8 @@ def getDomain(url):
 
 def getExtension(url):
     try:
-        path = urlparse.urlparse(url).path
-        return splitext(path)[1]
+        name, ext = os.path.splitext(url)
+        return ext.replace('.','')
     except:
         return 'ico'
 
